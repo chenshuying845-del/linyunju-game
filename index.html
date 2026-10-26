@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Secret iPhone</title>
+<style>
+*{box-sizing:border-box}
+:root{--wall:linear-gradient(145deg,#f7eadf,#dcece5,#d9e1f4);--ink:#34414b}
+body{margin:0;min-height:100vh;display:grid;place-items:center;padding:15px;background:#e9edf0;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;color:var(--ink)}
+.phone{width:min(375px,96vw);height:min(790px,94dvh);min-height:600px;background:#222a30;padding:7px;border-radius:46px;box-shadow:0 24px 65px #52636b55}
+.screen{height:100%;position:relative;overflow:hidden;border-radius:39px;background:var(--wall);isolation:isolate}
+.screen:before{content:"";position:absolute;inset:0;background:var(--wall);z-index:-1}
+.status{height:35px;padding:10px 23px 0;display:flex;justify-content:space-between;font-size:12px;font-weight:700}
+.island{position:absolute;top:7px;left:50%;transform:translateX(-50%);width:94px;height:23px;background:#141719;border-radius:20px}
+.statusright{margin-left:auto}
+.page{position:absolute;inset:35px 0 0;display:none;overflow:auto}
+.page.active{display:block}
+.center{text-align:center}
+.lock{height:100%;min-height:550px;padding:38px 22px 25px;display:flex;flex-direction:column;align-items:center}
+.date{font-size:15px}
+.clock{font-size:76px;line-height:1.3;font-weight:300;letter-spacing:-4px}
+.lockcard{margin-top:28px;width:100%;background:#ffffff68;border:1px solid #ffffff90;border-radius:22px;padding:17px;text-align:left;font-size:13px;line-height:1.7}
+.lockbottom{margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:13px;width:100%}
+.lockbtn,.primary{border:0;background:#ffffffb8;border-radius:22px;padding:12px 23px;cursor:pointer;color:#34414b;font-weight:600}
+.hint{font-size:11px;color:#6e7d84}
+#passwordDots{font-size:25px;letter-spacing:12px;margin:15px 0 19px;height:30px}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:245px}
+.key{height:55px;border:1px solid #ffffff95;background:#ffffff67;border-radius:18px;font-size:22px;color:#33414a;cursor:pointer}
+.key:active{background:#fff}
+.error{height:18px;color:#bb5c69;font-size:12px}
+.home{padding:8px 17px 18px;min-height:100%;display:flex;flex-direction:column}
+.welcome{font-size:13px;margin:7px 2px 13px}
+.widget{padding:16px 17px;border-radius:23px;background:#ffffff6e;border:1px solid #ffffff95;margin-bottom:20px}
+.widgettop{font-size:11px;color:#6c7a81}
+.widgettime{font-size:30px;margin:8px 0}
+.widgetsub{font-size:12px;color:#657780}
+.apps{display:grid;grid-template-columns:repeat(4,1fr);gap:22px 5px}
+.app{border:0;background:none;color:var(--ink);padding:0;cursor:pointer;min-width:0}
+.icon{width:53px;height:53px;margin:auto auto 6px;border-radius:15px;display:grid;place-items:center;font-size:27px;box-shadow:0 3px 9px #34414b12}
+.appname{font-size:10px;white-space:nowrap}
+.green{background:linear-gradient(140deg,#a7e67d,#46c769);color:white}
+.pink{background:linear-gradient(140deg,#7656ca,#ed6d98,#ffb95c);color:white}
+.black{background:#151719;color:white}
+.white{background:#ffffffdc}
+.yellow{background:linear-gradient(#fff0a7 0 20%,white 20%)}
+.blue{background:linear-gradient(140deg,#c8e5f0,#829bd0);color:white}
+.dock{margin-top:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 5px;background:#ffffff70;border-radius:23px}
+.dock .icon{width:47px;height:47px}
+.appview{position:absolute;inset:35px 0 0;background:#f6f7f9;display:none;flex-direction:column}
+.appview.active{display:flex}
+.apphead{display:flex;align-items:center;justify-content:space-between;padding:14px 15px;background:#ffffffed;border-bottom:1px solid #e9ecee;flex-shrink:0}
+.apphead h3{font-size:16px;margin:0;text-align:center;flex:1}
+.back{border:0;background:none;color:#638b9b;font-size:13px;cursor:pointer}
+.content{flex:1;overflow:auto;padding:14px}
+.muted{font-size:11px;color:#8a969e}
+.row{display:flex;align-items:center;gap:10px;padding:13px 0;border-bottom:1px solid #e8ebee;cursor:pointer}
+.avatar{width:43px;height:43px;border-radius:50%;background:#e0ebe4;display:grid;place-items:center;font-size:21px;flex-shrink:0;overflow:hidden}
+.rowtext{flex:1;min-width:0}
+.rowtext b{font-size:13px}
+.rowtext p{font-size:11px;color:#839098;margin:5px 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bubble{max-width:86%;background:white;border-radius:15px;padding:11px 12px;margin:9px 0;font-size:13px;line-height:1.65;overflow-wrap:anywhere}
+.mine{margin-left:auto;background:#d8f2b9}
+.replybox{padding:12px;background:white;border-top:1px solid #e9ecef;display:grid;gap:8px}
+.replybtn{border:1px solid #dce4e4;background:#f7faf8;padding:10px;border-radius:14px;text-align:left;font-size:12px;cursor:pointer}
+.post{background:white;border:1px solid #e9ecef;border-radius:17px;margin-bottom:14px;overflow:hidden}
+.posthead{display:flex;align-items:center;gap:8px;padding:12px;font-size:12px}
+.postphoto{height:165px;display:grid;place-items:center;font-size:55px;background:linear-gradient(145deg,#e9d7ce,#d6e7dc,#c8d7ed)}
+.posttext{font-size:12px;line-height:1.7;padding:10px 13px}
+.action{border:0;background:none;padding:5px 13px 13px;font-size:13px;cursor:pointer;color:#5e7681}
+.compose{width:100%;min-height:75px;border:1px solid #e0e6e7;border-radius:13px;padding:11px;font:inherit;font-size:13px;resize:vertical}
+.setting{background:white;border-radius:15px;padding:0 13px;margin-bottom:14px}
+.settingrow{padding:14px 0;border-bottom:1px solid #eef0f2;font-size:12px}
+.settingrow:last-child{border:0}
+.settingrow label{display:block;margin-bottom:8px;color:#718087}
+.settingrow input,.settingrow select{width:100%;padding:10px;border:1px solid #dce2e5;border-radius:10px;font:inherit;background:white}
+.smallbtn{border:0;border-radius:18px;background:#e0eee4;padding:9px 13px;font-size:12px;cursor:pointer;margin-top:8px}
+.toast{position:absolute;bottom:45px;left:50%;transform:translateX(-50%);padding:10px 14px;background:#25313be8;color:white;border-radius:20px;font-size:12px;display:none;z-index:9;white-space:nowrap}
+.homebar{position:absolute;bottom:5px;left:50%;transform:translateX(-50%);width:105px;height:4px;border-radius:5px;background:#2836408c;z-index:10}
+
+/* X 专属界面：仅作用于 X，不改变其他 App */
+.xshell{margin:-14px;padding:0;background:#fff;color:#0f1419;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif}
+.xnav{display:flex;align-items:center;gap:16px;padding:13px 15px;border-bottom:1px solid #eff3f4;position:sticky;top:0;background:#ffffffed;z-index:2}
+.xnav button,.xiconbtn{border:0;background:transparent;color:#0f1419;cursor:pointer;font-size:22px;padding:0}
+.xbrand{font-size:23px;font-weight:800;flex:1;text-align:center}
+.xprofile{padding:0 15px 15px;border-bottom:1px solid #eff3f4}
+.xbanner{height:95px;background:linear-gradient(120deg,#dce9e5,#d8e3f5,#f2e2d9);margin:0 -15px 0;}
+.xprofilepic{width:72px;height:72px;border:4px solid white;border-radius:50%;object-fit:cover;background:#e4e7eb;margin-top:-36px;position:relative}
+.xname{font-size:21px;font-weight:800;margin-top:3px}.xhandle{font-size:13px;color:#536471;margin:2px 0 10px}
+.xbio{font-size:13px;line-height:1.5;margin:8px 0}.xstats{font-size:12px;color:#536471;margin:10px 0}.xstats b{color:#0f1419}
+.xfollow{border:0;border-radius:22px;background:#0f1419;color:#fff;padding:9px 17px;font-weight:700;float:right;cursor:pointer}
+.xtabs{display:flex;border-bottom:1px solid #eff3f4;position:sticky;top:47px;background:#fff;z-index:1}
+.xtab{flex:1;border:0;background:white;padding:13px 4px;font-size:12px;color:#536471;cursor:pointer}.xtab.active{color:#0f1419;font-weight:800;border-bottom:3px solid #1d9bf0}
+.xtweet{display:flex;gap:10px;padding:14px 13px;border-bottom:1px solid #eff3f4;background:white;color:#0f1419}
+.xtweetavatar{width:42px;height:42px;flex-shrink:0;border-radius:50%;object-fit:cover;background:#e5e7eb}
+.xtweetbody{min-width:0;flex:1}.xbyline{font-size:12px;display:flex;gap:4px;align-items:center;flex-wrap:wrap}.xbyline strong{font-size:13px}.xmuted{color:#536471}.xdate{color:#536471;font-size:11px}.xtweettext{font-size:13px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;margin:5px 0 10px}
+.xmedia{width:100%;display:block;max-height:250px;object-fit:cover;border-radius:15px;border:1px solid #eff3f4;margin:7px 0 9px}
+.xactions{display:flex;justify-content:space-between;gap:4px;color:#536471}.xactions button{border:0;background:transparent;color:inherit;font-size:11px;cursor:pointer;padding:4px 2px}.xactions button.liked{color:#e0245e}
+.xsideveil{position:absolute;inset:0;background:#0006;z-index:10;display:none}.xsideveil.open{display:block}.xsidebar{position:absolute;left:0;top:0;bottom:0;width:84%;max-width:300px;background:#fff;padding:18px 15px;box-shadow:8px 0 25px #0002;overflow:auto;color:#0f1419}
+.xsidehead{display:flex;align-items:center;justify-content:space-between}.xsideavatar{width:48px;height:48px;border-radius:50%;object-fit:cover;background:#e5e7eb}.xsideitem{padding:15px 2px;border-bottom:1px solid #eff3f4;font-size:14px;cursor:pointer}.xaccount{display:flex;align-items:center;gap:10px;padding:13px 8px;border-radius:13px;cursor:pointer}.xaccount:hover{background:#f5f8fa}.xaccount img{width:43px;height:43px;object-fit:cover;border-radius:50%;background:#e5e7eb}.xswitch{position:absolute;inset:auto 12px 12px;background:white;border:1px solid #e1e8ed;box-shadow:0 5px 25px #0002;border-radius:18px;padding:13px;z-index:12;display:none;color:#0f1419}.xswitch.open{display:block}.xswitch h4{margin:4px 0 9px;font-size:15px}.xcompose{padding:12px;border-bottom:1px solid #eff3f4}.xcompose textarea{width:100%;min-height:70px;border:1px solid #d9e1e8;border-radius:13px;padding:10px;font:inherit;font-size:13px;resize:vertical}.xbluebtn{border:0;border-radius:22px;background:#1d9bf0;color:white;font-weight:700;padding:9px 15px;cursor:pointer}.xempty{padding:28px 18px;text-align:center;color:#536471;font-size:13px}
+
+</style>
+</head>
+<body>
+<div class="phone"><div class="screen" id="screen">
+<div class="status"><span id="statusTime">9:41</span><div class="island"></div><span class="statusright">▮▮▮　 Wi-Fi　▰</span></div>
+
+<section class="page active" id="lockPage">
+ <div class="lock">
+  <div class="date" id="lockDate">10月26日 星期一</div>
+  <div class="clock" id="lockClock">09:41</div>
+  <div class="lockcard">☁️ <b>私人手机</b><br>有些故事，需要解锁以后才会慢慢发现。</div>
+  <div class="lockbottom">
+   <div class="muted">请输入四位数字密码</div>
+   <div id="passwordDots">○ ○ ○ ○</div>
+   <div class="keypad">
+    <button class="key" onclick="keyIn('1')">1</button><button class="key" onclick="keyIn('2')">2</button><button class="key" onclick="keyIn('3')">3</button>
+    <button class="key" onclick="keyIn('4')">4</button><button class="key" onclick="keyIn('5')">5</button><button class="key" onclick="keyIn('6')">6</button>
+    <button class="key" onclick="keyIn('7')">7</button><button class="key" onclick="keyIn('8')">8</button><button class="key" onclick="keyIn('9')">9</button>
+    <button class="key" onclick="clearPass()">⌫</button><button class="key" onclick="keyIn('0')">0</button><button class="key" onclick="checkPass()">↵</button>
+   </div>
+   <div class="error" id="passError"></div>
+   <div class="hint">密码：0627</div>
+  </div>
+ </div>
+</section>
+
+<section class="page" id="homePage">
+ <div class="home">
+  <div class="welcome" id="welcome">Good day ☁️</div>
+  <div class="widget"><div class="widgettop">MY LITTLE WORLD · 今日记录</div><div class="widgettime" id="homeClock">09:41</div><div class="widgetsub" id="storyStatus">有 5 个联系人，也许有人正等着你回复。</div></div>
+  <div class="apps">
+   <button class="app" onclick="openApp('line')"><div class="icon green">●</div><div class="appname">LINE</div></button>
+   <button class="app" onclick="openApp('insta')"><div class="icon pink">◎</div><div class="appname">Instagram</div></button>
+   <button class="app" onclick="openApp('x')"><div class="icon black">𝕏</div><div class="appname">X</div></button>
+   <button class="app" onclick="openApp('settings')"><div class="icon blue">⚙</div><div class="appname">设置</div></button>
+   <button class="app" onclick="openApp('notes')"><div class="icon yellow">📝</div><div class="appname">备忘录</div></button>
+   <button class="app" onclick="openApp('photos')"><div class="icon white">🌈</div><div class="appname">照片</div></button>
+   <button class="app" onclick="openApp('music')"><div class="icon pink">♫</div><div class="appname">音乐</div></button>
+   <button class="app" onclick="openApp('phone')"><div class="icon green">☎</div><div class="appname">电话</div></button>
+  </div>
+  <div style="flex:1;min-height:22px"></div>
+  <div class="dock">
+   <button class="app" onclick="openApp('phone')"><div class="icon green">☎</div></button>
+   <button class="app" onclick="openApp('line')"><div class="icon green">●</div></button>
+   <button class="app" onclick="openApp('insta')"><div class="icon pink">◎</div></button>
+   <button class="app" onclick="openApp('x')"><div class="icon black">𝕏</div></button>
+  </div>
+ </div>
+</section>
+
+<section class="appview" id="appView">
+ <header class="apphead"><button class="back" onclick="backHome()">‹ 桌面</button><h3 id="appTitle">LINE</h3><button class="back" onclick="backHome()">⌂</button></header>
+ <div class="content" id="appContent"></div>
+ <div id="appFooter"></div>
+</section>
+<div class="toast" id="toast"></div>
+<div class="homebar" onclick="backHome()"></div>
+</div></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const defaultContacts=[
+ {name:'樊振东',emoji:'🐼',preview:'有件事想跟你说。',messages:[{from:'them',text:'最近还好吗？有件事想跟你说。'},{from:'them',text:'前几天那件事，你还记得吗？'}],replies:['记得，你说吧。','最近还好，你呢？','怎么突然这么认真？'],next:'你还记得那天大家一起拍的照片吗？我好像发现了一个细节。',clue:'照片背后似乎藏着一个日期：06/27。'},
+ {name:'冯翊新',emoji:'🌬️',preview:'你有没有看那条动态？',messages:[{from:'them',text:'你有没有看那条动态？'},{from:'them',text:'总觉得有人在暗示什么。'}],replies:['哪一条动态？','我看到了，你怎么想？','你是不是知道些什么？'],next:'那条动态发出的时间，和你手机的密码很像。',clue:'有人似乎知道你的手机密码，但他为什么不直接说？'},
+ {name:'朋友',emoji:'🌷',preview:'我觉得你应该看看他的动态。',messages:[{from:'them',text:'我觉得你应该看看他的动态。'},{from:'them',text:'最近你是不是有事情瞒着我？'}],replies:['我也正在调查。','等我理清楚再告诉你。','你先说说你发现了什么。'],next:'我看到有人把一张旧照片设成了仅自己可见。',clue:'旧照片的发布者隐藏了内容，或许 Instagram 上还有线索。'},
+ {name:'哥哥',emoji:'🌙',preview:'密码还是那个数字吗？',messages:[{from:'them',text:'到家了吗？'},{from:'them',text:'密码还是那个数字吗？记得保护好自己的隐私。'}],replies:['到了，放心吧。','你为什么问密码？','我会注意的。'],next:'六月二十七日那天，你说过要保守一个秘密。',clue:'哥哥知道 0627 的含义，却似乎不愿意直接告诉你。'},
+ {name:'张本智和',emoji:'👦',preview:'那天的事情，你还在意吗？',messages:[{from:'them',text:'嗨，好久不见。'},{from:'them',text:'那天的事情，你还在意吗？'}],replies:['你指的是哪件事？','有些事我还记得。','我们可以好好聊聊。'],next:'如果你想知道答案，就去看看 X 上那条没有署名的帖子。',clue:'那条匿名帖子提到了一个只有你们才知道的约定。'}
+];
+let contacts=JSON.parse(localStorage.getItem('myPhoneContacts')||'null')||defaultContacts.map(c=>({...c,messages:c.messages.map(m=>({...m}))}));
+let owner=localStorage.getItem('myPhoneOwner')||'小屿';
+let wall=localStorage.getItem('myPhoneWall')||'mint';
+let avatar=localStorage.getItem('myPhoneAvatar')||'🌷';
+let clueCount=Number(localStorage.getItem('myPhoneClues')||0);
+let currentApp='',chatIndex=-1,pass='',activeMessages=[],notifications=0;
+let posts=[
+ {name:'mimi',emoji:'🌷',text:'有些故事，不是忘记了，而是还没找到合适的答案。',photo:'🌷'},
+ {name:'dailyblue',emoji:'🌊',text:'今天翻到了一张旧照片，突然想起了六月的某一天。',photo:'🌊'},
+ {name:'coffee',emoji:'☕',text:'如果你收到这条动态，也许你会明白我的意思。',photo:'☕'}
+];
+
+let xAccount='main';
+const mainAccountPosts=[
+ {date:'24/2/19',text:'I finished the last match in my first T-league yesterday! We did our best though the results were a little bit disappointing. It’s a fabulous experience with Okayama rivets to compete with other teams',photo:'assets/photo-team-selfie.jpg'},
+ {date:'24/2/19',text:'Thanks to the sponsors of Okayama rivets, leader and coaches and I truly appreciate my teammates’ help. I got many valuable experiences from them. Without them, I would not be here. In addition, I saw so many fans coming here. Thank for being with me. Fight for Champions!! Cheers!! 💪',photo:'assets/photo-team.jpg'},
+ {date:'24/2/19',text:'A long day, a lot to be grateful for. See you next time.',photo:'assets/photo-airport.jpg'}
+];
+const smallStoryTexts=[
+'他說要和我試一下，不是試著談戀愛，是試著看看身體是否契合的意思，我沒想到他會主動來找我。更衣室的空調打得太低了，水汽散髮的熱意在觸碰到身體的時候已經涼透，我想我的心也很涼。他看上去很認真，平常不會直視我的眼睛，這次卻直勾勾地盯著我看，那時我就在想，如果我拒絕他，是不是再也看不到他的這個眼神了？我說，給我一天時間考慮一下。',
+'第二天一大早我就要回台北，坐在候機廳等待的時候看到手機上傳來的消息，朋友的，哥哥的，沒有他的。對話框很安靜，停留在年初的新春祝福。他不太會打中文，傳過來短短的語音，說林選手，新年快樂，背景有隱隱約約的笑鬧聲，而我沒有告訴他的是，離台北的新年還有一個小時，我只是說，謝謝你，新年快樂。\n起飛前我給他的line發去消息，說我答應。',
+'我坐地鐵來見他，戴著口罩和鴨舌帽，馮翊新問我為什麼這麼晚了還要出門，我說去見一個很久沒有見的朋友，朋友還穿得這麼……他欲言又止，給我了一個模棱兩可的比劃，我知道他覺得我穿得很奇怪，不像是以前和朋友出門會穿的衣服，我沒有告訴他的是，我只是不想被人認出來而已。\n酒店的門敲了一下就打開了，他站在門內等我進來，穿著看起來溫暖的睡衣，身體還有沐浴露隱隱的香味。他很膽怯地避開我的視線，嘟噥了一句我聽不懂的日語，緊接著轉換生澀的中文，請進，請進。我們的關係在那天的line上被確定，儘管我不明白他出於什麼樣的目的和我談起的這些，我想，我有必要把握住眼前想把握的。\n我用腳關上門，趁他沒有反應過來親吻他的嘴唇。',
+'他睡熟了，靠近能聽見均勻的呼吸，我把手機的亮度調到最低，生怕他驚醒，倚在床頭打下這些字。\n我好困惑。說不心動是假的，他靠過來的姿態，擁抱我的神情，親吻我的模樣，讓我漸漸覺得這一切並不是那麼虛幻，是伸手就能握住的圖景，我念出他的乳名，想逗一逗他，結果他往我的肩頭狠狠咬了一口，像狗一樣給我咬出一個印子，事後還在慌張地朝那裡吹起，說對不起我不是故意的。\n我猜他就是故意的。\n那我只好老老實實叫他的姓氏。反正我叫過那麼多次。',
+'馮翊新問我這幾天都去哪了，為什麼不回酒店睡覺，我打哈哈說露宿街頭了，他的表情沈下來，說我可沒有那麼好糊弄，你是不是去找他了？\n我驚得說不出話來，你怎麼知道的？你怎麼發現的？馮翊新說，我們在同一個訓練場訓練時，只要是休息，你都會看向他的方向。\n我被堵得說不出話來，忽略了他不贊同的眼神，心裡卻在想，那他有看我沒有呀？',
+'他開始找我聊天，用語音的方式，中文比我說得還要黏黏糊糊，有時候為了體現他看得懂中文還偏偏要打字給我，寫了一堆錯別字還不承認。我說好吧好吧，你以後不如將日語給我聽，他笑了，嘀嘀咕咕在語音里說半天，最後說我想要你聽得懂我在講什麼。\n我說我聽得懂呀，他說那你能看懂我嗎？',
+'好久沒有登陸這個賬號。以前的心境居然依稀記不太清了，不知道是我現在習慣了他的消息，我們的關係，還是暫時不想從這段關係當中解脫出來？好難的命題。',
+'最近沒和他對上過，竟然有些想念。',
+'聽說他本來也要去老瓦杯，但是因為聯賽的事情還是放棄了，偶爾想想如果我們做隊友，那應該挺精彩的。',
+'我們約了下次見面的時間。',
+'想了想還是決定把這件事記錄下來。睡在他房間的時候好像聽到有人在敲門，迷迷糊糊覺得這是自己的房間了，再加上他更是睡得昏沈，一直在推我讓我去開門，迫於無奈我只好去了，結果拉開門，迎面撞上他隊友的臉。\n事到如今，我只能安慰自己，房間昏暗，說不定篠塚沒看到我是誰，卻無法忽視關上門的那一刻他真真切切的驚恐。他也醒了，坐在床頭不知所措，想了想又想我擔保說篠塚不會往外亂說的。\n可是，我們之間到底有什麼好說的呢？我到最後也沒有勇氣問出口。偶爾，我是說偶爾，我會退縮。',
+'上半年比賽湊得緊，我們沒有再提見面的事，反正比賽的時候在官酒和訓練場抬頭不見低頭見的，當然，我們不會打招呼。\n篠塚經歷了上一次的事之後對我的眼神總是有著探究，但隨他吧！反正我裝作聽不懂他們說話也不是一次兩次了。',
+'他問我，累嗎？\n事後難得溫存了一會，我沒聽清楚他說的什麼，又問了一遍，他貼著我的耳朵小聲地，看起來不是很在乎地問，你累嗎？\n我想推開他。\n你為什麼會問這個問題呢？當初是你先開始的，是你要牽著我的手，在酒店等我的，為什麼要問我累不累呢？我想說，我想說……如果我累了，我也不會握緊你的手了。\n但我什麼也沒有說，我也沒有推開他。',
+'躲著他是很輕易的事情。不回消息、避開常去的地方，拉著馮翊新在食堂吃飯，假裝沒有看見他。你無法叫醒一個裝睡的人，而我只是突然不想面對我們現在的關係。\n朋友？算不上；敵人？誰會和敵人做愛，卡在一個不尷不尬的位置，好像沒有他開口提出的那層關係，我們的定位就無法得到一個合理的解釋，好像只有我們當中的誰先往前邁一步，這道題才會有不一樣的解法。\n可張本，我好累。對你有感情是一件很累的事。',
+'他把馮翊新支開了，堵著我在更衣室，不讓別人進來。我怎麼從來沒有發現生活里他也是這麼執拗的一個人？林，他開始直白地稱呼我的名字，你生氣了是不是。\n我沒生氣，我說。\n那給你發消息你都不回。\n我太累了，不想回。我裝作很冷酷地樣子，沒錯過他眼裡一閃而過的受傷。於是我只好放軟了語氣，說我最近太忙了，實在是沒空和你見面。\n連一句話也不願意和我說嗎？\n他還想說什麼，我知道他想吻我，他甚至抓起了我的衣領。但門外響起了重重的敲門聲，我躲過去了。',
+'他後來也沒再來找過我。',
+'登上這個號是昨天夢到他了。夢見我們還保持著那樣的關係的時候，他枕在我的膝蓋上玩手機。我閉著眼睛假寐，夢里他拿起我的手機晃呀晃，點開我和他的聊天框，裝作我本人和他自己聊天。\n你好呀。\n你好呀。\n你是誰？\n我是tomo，你是toby嗎？\n他被自己逗得直樂，我懶得理他，結果他不一會自己拿著手機懟到我的眼皮子底下，故作驚喜地問，是誰在和你表白呀？\n我睜開眼，看到那個聊天框最頂上的名字是harimoto。\n我撤回了，他洋洋得意地說，你永遠都不知道我給你寫了什麼了。\n從夢里醒來我才想起，那是現實發生過的事，只不過在夢里愈發清晰地重演了一遍，而我那時候沒有真的睡著，沒有真的閉眼睛，我真的看到他給我發了什麼話。\n我怎麼忘記了呢？',
+'明明一開始我想的是，如果他不喜歡我，那我們一直保持著這樣的關係就夠了，可為什麼，我想要的越來越多，我越來越得不到滿足呢？\n是那天他打完字又撤回，說他愛我的那一刻嗎？'
+];
+const smallStoryDates=['2024-02-08','2024-02-09','2024-02-12','2024-02-14','2024-02-20','2024-02-24','2025-03-11','2025-03-28','2025-04-16','2025-05-03','2025-05-17','2025-06-06','2025-06-19','2025-07-02','2025-07-15','2025-08-23','2026-06-12','2026-07-09'];
+const smallAccountPosts=smallStoryTexts.map((text,i)=>({date:smallStoryDates[i],text,photo:''}));
+
+const walls={mint:'linear-gradient(145deg,#f7eadf,#dcece5,#d9e1f4)',pink:'linear-gradient(145deg,#f6dbe5,#f6e8d8,#e1d9f3)',blue:'linear-gradient(145deg,#d7e8f2,#cbd7f3,#e4e9f1)',night:'linear-gradient(145deg,#343e5a,#52677d,#9bafbb)'};
+function save(){
+ localStorage.setItem('myPhoneContacts',JSON.stringify(contacts));
+ localStorage.setItem('myPhoneOwner',owner);localStorage.setItem('myPhoneWall',wall);
+ localStorage.setItem('myPhoneAvatar',avatar);localStorage.setItem('myPhoneClues',clueCount);
+}
+function clock(){
+ let d=new Date(),t=d.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit',hour12:false});
+ $('statusTime').textContent=t;$('lockClock').textContent=t;$('homeClock').textContent=t;
+ $('lockDate').textContent=d.toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'long'});
+}
+clock();setInterval(clock,10000);
+function applyWall(){ $('screen').style.setProperty('--wall',walls[wall]||walls.mint); }
+applyWall();
+function keyIn(n){if(pass.length>=4)return;pass+=n;showPass();if(pass.length===4)setTimeout(checkPass,120)}
+function clearPass(){pass=pass.slice(0,-1);showPass();$('passError').textContent=''}
+function showPass(){$('passwordDots').textContent=Array.from({length:4},(_,i)=>i<pass.length?'●':'○').join(' ')}
+function checkPass(){
+ if(pass==='0627'){
+  $('lockPage').classList.remove('active');$('homePage').classList.add('active');
+  $('welcome').textContent='Good day, '+owner+' '+avatar;
+  toast('欢迎回来，'+owner+' ✨');pass='';showPass();$('passError').textContent='';
+ }else{
+  $('passError').textContent='密码不正确，请再试一次';pass='';showPass();
+ }
+}
+function backHome(){$('appView').classList.remove('active');$('homePage').classList.add('active');currentApp='';chatIndex=-1}
+function openApp(app){
+ currentApp=app;$('homePage').classList.remove('active');$('appView').classList.add('active');render();
+}
+function toast(s){$('toast').textContent=s;$('toast').style.display='block';clearTimeout(window.toastT);window.toastT=setTimeout(()=>$('toast').style.display='none',1900)}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function render(){
+ const titles={line:'LINE',insta:'Instagram',x:'X',settings:'设置',notes:'备忘录',photos:'照片',music:'音乐',phone:'电话'};
+ $('appTitle').textContent=titles[currentApp]||currentApp;
+ const c=$('appContent'),f=$('appFooter');f.innerHTML='';
+ if(currentApp==='line')renderLine(c,f);
+ else if(currentApp==='insta')renderInsta(c);
+ else if(currentApp==='x')renderX(c);
+ else if(currentApp==='settings')renderSettings(c);
+ else if(currentApp==='notes')renderNotes(c);
+ else if(currentApp==='photos')renderPhotos(c);
+ else if(currentApp==='music')c.innerHTML='<div class="center" style="padding:40px 5px"><div style="font-size:70px">♫</div><h3>Soft Morning</h3><p class="muted">Dreamy Days · 模拟播放器</p><button class="primary" onclick="toast(\'正在播放（模拟）\')">▶ 播放</button></div>';
+ else c.innerHTML='<div class="center" style="padding:45px 5px"><div style="font-size:55px">☎️</div><h3>个人收藏</h3><p class="muted">模拟电话页面，不会拨打真实电话。</p><button class="primary" onclick="toast(\'呼叫中（模拟）\')">模拟拨打</button></div>';
+}
+function renderLine(c,f){
+ if(chatIndex<0){
+  c.innerHTML='<div class="muted" style="margin-bottom:8px">聊天　好友　动态 · '+contacts.length+' 位联系人</div>'+
+  contacts.map((p,i)=>`<div class="row" onclick="openChat(${i})"><div class="avatar">${esc(p.emoji)}</div><div class="rowtext"><b>${esc(p.name)}</b><p>${esc(p.preview)}</p></div><span class="muted">›</span></div>`).join('')+
+  `<div style="padding:18px 0" class="muted">💌 聊天中的线索会慢慢拼成一个故事。</div><button class="smallbtn" onclick="randomMessage()">模拟收到一条新消息</button>`;
+ }else{
+  let p=contacts[chatIndex];
+  c.innerHTML=`<div class="center muted">与 ${esc(p.name)} 的对话 · 虚构剧情</div><div id="chatlog">${p.messages.map(m=>`<div class="bubble ${m.from==='me'?'mine':''}">${esc(m.text)}</div>`).join('')}</div>`;
+  if(!p.replied){
+   f.innerHTML='<div class="replybox"><div class="muted">选择你的回复：</div>'+p.replies.map((r,i)=>`<button class="replybtn" onclick="reply(${i})">${esc(r)}</button>`).join('')+'</div>';
+  }else{
+   f.innerHTML='<div class="replybox"><button class="replybtn" onclick="backToChats()">‹ 返回聊天列表</button></div>';
+  }
+ }
+}
+function openChat(i){chatIndex=i;render()}
+function backToChats(){chatIndex=-1;render()}
+function reply(i){
+ const p=contacts[chatIndex];if(p.replied)return;
+ p.messages.push({from:'me',text:p.replies[i]});
+ p.messages.push({from:'them',text:p.next});
+ p.preview=p.next;p.replied=true;clueCount++;
+ save();render();$('storyStatus').textContent='已发现 '+clueCount+' 条故事线索';
+ toast('发现新线索！🔎');
+}
+function randomMessage(){
+ const p=contacts[Math.floor(Math.random()*contacts.length)];
+ p.messages.push({from:'them',text:['你在吗？我刚想到一件事。','看到你的动态了，晚点聊聊？','有空的话，看看之前那张照片。'][Math.floor(Math.random()*3)]});
+ p.preview=p.messages[p.messages.length-1].text;notifications++;save();render();
+ toast(p.name+' 发来了一条新消息');
+}
+function renderInsta(c){
+ c.innerHTML=`<div class="muted" style="margin-bottom:12px">动态 · 关注的人</div>
+ <div style="display:flex;gap:12px;overflow:auto;margin-bottom:16px">${[['🌷','你的动态'],['🌙','mimi'],['🐈','catday'],['☕','coffee']].map(a=>`<div class="center" style="font-size:10px;flex-shrink:0"><div class="avatar" style="margin-bottom:5px">${a[0]}</div>${a[1]}</div>`).join('')}</div>
+ ${posts.map((p,i)=>`<div class="post"><div class="posthead"><div class="avatar">${esc(p.emoji)}</div><b>${esc(p.name)}</b><span class="muted" style="margin-left:auto">•••</span></div><div class="postphoto">${esc(p.photo)}</div><button class="action" onclick="likeInsta(this)">♡ 喜欢</button><div class="posttext"><b>${esc(p.name)}</b> ${esc(p.text)}<br><span class="muted">评论　分享</span></div></div>`).join('')}
+ <button class="smallbtn" onclick="newPost()">模拟刷新动态</button>`;
+}
+function likeInsta(b){b.textContent=b.textContent.includes('♡')?'♥ 已喜欢':'♡ 喜欢';b.style.color=b.textContent.includes('♥')?'#e66b88':''}
+function newPost(){
+ posts.unshift({name:'newday',emoji:'☁️',text:clueCount>2?'有人已经开始接近真相了。六月二十七日，别忘了。':'有时候，一条不起眼的动态会成为故事的开端。',photo:'☁️'});
+ render();toast('发现一条新动态');
+}
+function renderX(c){
+ const isSmall=xAccount==='omo_1727';
+ const name=isSmall?'omo_1727':'Lin Yun-Ju';
+ const handle=isSmall?'@omo_1727':'@toby0817_';
+ const avatarSrc=isSmall?'':'assets/profile.jpg';
+ const avatarMarkup=isSmall?'<div class="xtweetavatar" style="display:grid;place-items:center;color:#8a9299;font-size:23px">●</div>':`<img class="xtweetavatar" src="${avatarSrc}" alt="Lin Yun-Ju 头像">`;
+ const headerAvatar=isSmall?'<div class="xsideavatar" style="display:grid;place-items:center;color:#8a9299;font-size:23px">●</div>':`<img class="xsideavatar" src="${avatarSrc}" alt="头像">`;
+ const posts=isSmall?smallAccountPosts:mainAccountPosts;
+ c.innerHTML=`<div class="xshell">
+  <div class="xnav"><button onclick="toggleXSidebar(true)" aria-label="打开账号侧边栏">☰</button><div class="xbrand">𝕏</div><button onclick="toggleXSidebar(true)" aria-label="账号">${isSmall?'●':'◉'}</button></div>
+  <div class="xprofile"><div class="xbanner"></div>${isSmall?'<div class="xprofilepic" style="display:grid;place-items:center;color:#8a9299;font-size:24px">●</div>':`<img class="xprofilepic" src="${avatarSrc}" alt="Lin Yun-Ju 头像">`}<button class="xfollow" onclick="toast('关注状态（模拟）')">${isSmall?'编辑个人资料':'关注'}</button><div class="xname">${esc(name)}</div><div class="xhandle">${esc(handle)}</div><div class="xbio">${isSmall?'private thoughts, saved here.':'Table tennis · 林昀儒｜把每一场比赛都认真打好。'}</div><div class="xstats"><b>${isSmall?'18':'37'}</b> 正在关注　 <b>${isSmall?'0':'1,777'}</b> 关注者</div></div>
+  <div class="xtabs"><button class="xtab active" onclick="switchXTab(this,'posts')">帖子</button><button class="xtab" onclick="switchXTab(this,'replies')">回复</button><button class="xtab" onclick="switchXTab(this,'media')">媒体</button><button class="xtab" onclick="switchXTab(this,'likes')">喜欢</button></div>
+  ${!isSmall?`<div class="xcompose"><textarea id="xNewPost" placeholder="发布新帖子"></textarea><div style="display:flex;justify-content:flex-end;margin-top:7px"><button class="xbluebtn" onclick="publishXPost()">发帖</button></div></div>`:''}
+  <div id="xTimeline">${posts.map((p,i)=>renderXPost(p,i,isSmall)).join('')}</div>
+  <div class="xsideveil" id="xSideVeil" onclick="toggleXSidebar(false)"><div class="xsidebar" onclick="event.stopPropagation()"><div class="xsidehead"><b style="font-size:17px">账户信息</b><button class="xiconbtn" onclick="toggleXSidebar(false)">×</button></div><div style="margin:18px 0 8px">${headerAvatar}</div><b>${esc(name)}</b><div class="xhandle">${esc(handle)}</div><div class="xstats"><b>${isSmall?'18':'37'}</b> 正在关注　 <b>${isSmall?'0':'1,777'}</b> 关注者</div><div class="xsideitem" onclick="toggleXSidebar(false);toast('主页')">个人主页</div><div class="xsideitem" onclick="toggleXAccountSwitcher()"><b>切换账号</b><span style="float:right">⌄</span></div><div style="font-size:11px;color:#536471;padding:13px 2px">当前为本地模拟账号，不会连接真实 X。</div></div></div>
+  <div class="xswitch" id="xAccountSwitcher"><h4>切换账号</h4><div class="xaccount" onclick="switchXAccount('main')"><img src="assets/profile.jpg" alt="Lin Yun-Ju"><div><b>Lin Yun-Ju</b><div class="xhandle">@toby0817_</div></div>${!isSmall?'<span style="margin-left:auto">✓</span>':''}</div><div class="xaccount" onclick="switchXAccount('omo_1727')"><div style="width:43px;height:43px;border-radius:50%;background:#e5e7eb;display:grid;place-items:center;color:#8a9299;font-size:22px">●</div><div><b>omo_1727</b><div class="xhandle">@omo_1727</div></div>${isSmall?'<span style="margin-left:auto">✓</span>':''}</div><button class="xbluebtn" style="width:100%;margin-top:7px" onclick="toggleXAccountSwitcher(false)">完成</button></div>
+ </div>`;
+}
+function renderXPost(p,i,isSmall){
+ const av=isSmall?'<div class="xtweetavatar" style="display:grid;place-items:center;color:#8a9299;font-size:23px">●</div>':'<img class="xtweetavatar" src="assets/profile.jpg" alt="Lin Yun-Ju 头像">';
+ const media=p.photo?`<img class="xmedia" src="${p.photo}" alt="帖子配图" loading="lazy">`:'';
+ return `<article class="xtweet"><div>${av}</div><div class="xtweetbody"><div class="xbyline"><strong>${esc(isSmall?'omo_1727':'Lin Yun-Ju')}</strong><span class="xmuted">${esc(isSmall?'@omo_1727':'@toby0817_')}</span><span class="xdate">· ${esc(p.date||'2024年')}</span></div><div class="xtweettext">${esc(p.text)}</div>${media}<div class="xactions"><button onclick="toast('回复（模拟）')">♧ 回复</button><button onclick="toast('已转发（模拟）')">⇄ 转发</button><button onclick="toggleXLike(this)">♡ 喜欢</button><button onclick="toast('已收藏（模拟）')">♧ 收藏</button></div></div></article>`;
+}
+function toggleXSidebar(open){const el=$('xSideVeil');if(el)el.classList.toggle('open',open)}
+function toggleXAccountSwitcher(open){const el=$('xAccountSwitcher');if(!el)return;el.classList.toggle('open',open===undefined?!el.classList.contains('open'):open)}
+function switchXAccount(account){xAccount=account;renderX($('appContent'));toast(account==='main'?'已切换到 Lin Yun-Ju':'已切换到 omo_1727');}
+function switchXTab(btn,tab){document.querySelectorAll('.xtab').forEach(x=>x.classList.remove('active'));btn.classList.add('active');if(tab==='posts')return;const timeline=$('xTimeline');if(timeline)timeline.innerHTML=`<div class="xempty">${tab==='media'?'暂无更多媒体内容':tab==='replies'?'还没有回复':'喜欢的内容暂未显示'}<br><span style="font-size:11px">这是本地模拟页面</span></div>`}
+function toggleXLike(btn){btn.classList.toggle('liked');btn.textContent=btn.classList.contains('liked')?'♥ 已喜欢':'♡ 喜欢'}
+function publishXPost(){const input=$('xNewPost');if(!input||!input.value.trim()){toast('先写点内容吧');return}mainAccountPosts.unshift({date:'刚刚',text:input.value.trim(),photo:''});renderX($('appContent'));toast('已发布模拟动态')}
+
+function tweet(n,e,t){return `<div class="post" style="padding:12px;display:flex;gap:9px"><div class="avatar">${e}</div><div style="flex:1;font-size:12px;line-height:1.7"><b>${esc(n)}</b><div>${esc(t)}</div><button class="action" onclick="toast('评论功能（模拟）')">评论</button><button class="action" onclick="this.textContent=this.textContent.includes('♡')?'♥ 已喜欢':'♡ 喜欢'">♡ 喜欢</button></div></div>`}
+function publishTweet(){
+ const input=$('tweetInput'),v=input.value.trim();if(!v){toast('先写点内容吧');return}
+ $('tweets').insertAdjacentHTML('afterbegin',tweet(owner,avatar,v));input.value='';toast('已发布模拟动态');
+}
+function renderSettings(c){
+ c.innerHTML=`<div class="setting"><div class="settingrow"><label>手机主人名字</label><input id="ownerInput" value="${esc(owner)}" maxlength="16"></div><div class="settingrow"><label>手机主人头像（输入一个 emoji）</label><input id="avatarInput" value="${esc(avatar)}" maxlength="8"></div>
+ <div class="settingrow"><label>手机壁纸</label><select id="wallInput"><option value="mint">薄荷奶油</option><option value="pink">樱花粉</option><option value="blue">晴空蓝</option><option value="night">静谧夜色</option></select></div>
+ <button class="primary" style="margin:12px 0" onclick="saveSettings()">保存个性化设置</button></div>
+ <div class="setting"><div style="padding:13px 0;font-weight:700;font-size:13px">LINE 联系人改名</div>
+ ${contacts.map((p,i)=>`<div class="settingrow"><label>${esc(p.name)}</label><input id="contact${i}" value="${esc(p.name)}" maxlength="20"></div>`).join('')}
+ <button class="primary" style="margin:12px 0" onclick="saveNames()">保存联系人名字</button></div>
+ <div class="setting"><div class="settingrow"><b>剧情进度</b><p class="muted">已发现 ${clueCount} 条线索。选择不同的回复，会影响你发现故事的过程。</p><button class="smallbtn" onclick="resetStory()">重新开始剧情</button></div></div>
+ <div class="muted">演示版本：设置保存在当前浏览器中。</div>`;
+ $('wallInput').value=wall;
+}
+function saveSettings(){
+ owner=$('ownerInput').value.trim()||'小屿';avatar=$('avatarInput').value.trim()||'🌷';wall=$('wallInput').value;
+ save();applyWall();$('welcome').textContent='Good day, '+owner+' '+avatar;toast('设置已保存');render();
+}
+function saveNames(){
+ contacts.forEach((p,i)=>{const v=$('contact'+i).value.trim();if(v)p.name=v});
+ save();toast('联系人名字已更新');render();
+}
+function resetStory(){
+ if(!confirm('确定要重置剧情进度吗？聊天记录和线索都会恢复初始状态。'))return;
+ contacts=defaultContacts.map(p=>({...p,messages:p.messages.map(m=>({...m})),replied:false}));
+ clueCount=0;save();toast('剧情已重新开始');render();
+}
+function renderNotes(c){
+ c.innerHTML=`<div class="post" style="padding:15px"><h3 style="font-size:15px">☁️ 给自己的小纸条</h3><textarea id="note" class="compose" style="min-height:230px" placeholder="写下你的想法……"></textarea><button class="primary" style="margin-top:12px" onclick="localStorage.setItem('myPhoneNote',$('note').value);toast('备忘录已保存')">保存</button></div>`;
+ $('note').value=localStorage.getItem('myPhoneNote')||'六月二十七日。\\n还有一些事情没有答案……';
+}
+function renderPhotos(c){
+ c.innerHTML=`<h3 style="font-size:15px">最近项目</h3><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px">${['🌷','🌊','☁️','🌿','🌅','🐈','☕','🌸','🌙','🍓','🪴','✨'].map((e,i)=>`<div style="aspect-ratio:1;display:grid;place-items:center;border-radius:9px;font-size:28px;background:${['#f4e0db','#dce9ee','#e9e6f1','#dbe9dc'][i%4]}">${e}</div>`).join('')}</div><p class="muted">演示相册 · 暂无真实照片</p>`;
+}
+</script>
+</body></html>
